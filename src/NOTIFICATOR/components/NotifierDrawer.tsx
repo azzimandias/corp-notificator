@@ -1,8 +1,16 @@
 import { Button, Drawer } from 'antd';
 import {useCallback, useEffect, useState} from 'react';
 import NotiCard from './NotiCard';
-import { MOCK_NOTICES } from '../mock/mock.ts';
-import {useNotificationSocket} from "../context/NotificatorSocketContext.tsx";
+import { MOCK_NOTICES } from '../mock/mock';
+import {useNotificationSocket} from "../context/NotificatorSocketContext";
+import type {Notification} from "../types/types";
+
+interface FreshResponse {
+    count?: number;
+    message: string;
+    status: number;
+    data: Notification[];
+}
 
 /**
  * Компонент нотификации - показывает уведомления, присланные с бэка
@@ -17,18 +25,18 @@ const NotifierDrawer = ({is_open, on_count_change, on_close}: {
     on_count_change: (count: number) => void;
     on_close: () => void;
 }) => {
-    const [notifications, setNotifications] = useState([]);
-    const [noticePage, setNoticePage] = useState(1);
-    const [noticeIgnore, setNoticeIgnore] = useState([]);
-    const [countOfNewNotifications, setCountOfNewNotifications] = useState(0);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [noticePage, setNoticePage] = useState<number>(1);
+    const [noticeIgnore, setNoticeIgnore] = useState<number[]>([]);
+    const [countOfNewNotifications, setCountOfNewNotifications] = useState<number>(0);
 
-    const [notificatorOpened, setNotificatorOpened] = useState(false);
-    const [notificatorLoading, setNotificatorLoading] = useState(true);
+    const [notificatorOpened, setNotificatorOpened] = useState<boolean>(false);
+    const [notificatorLoading, setNotificatorLoading] = useState<boolean>(true);
 
     const {
         PRODMODE,
         CSRF_TOKEN,
-        refreshKey,          // провоцирует refetch
+        refreshKey,  // провоцирует refetch
     } = useNotificationSocket();
 
     const notificationRead = (id: number) => {
@@ -62,16 +70,16 @@ const NotifierDrawer = ({is_open, on_count_change, on_close}: {
         }
     }, [CSRF_TOKEN, PRODMODE]);
 
-
     const getFreshNotices = useCallback(async ()=> {
         try {
             if (!PRODMODE || !CSRF_TOKEN) return;
             const response = await fetch('/api/notice/fresh' + '?_token=' + CSRF_TOKEN);
+            const responseData: FreshResponse = await response.json();
 
-            setNotifications(response.data.data);
-            let ignore = [];
-            for (let i = 0; i < response.data.data.length; i++){
-                ignore.push(response.data.data[i].id);
+            setNotifications(responseData.data);
+            const ignore: number[] = [];
+            for (let i = 0; i < responseData.data.length; i++){
+                ignore.push(responseData.data[i].id);
             }
             setNoticeIgnore(ignore);
             setCountOfNewNotifications(ignore.length);
@@ -96,16 +104,15 @@ const NotifierDrawer = ({is_open, on_count_change, on_close}: {
                     _token: CSRF_TOKEN
                 }),
             });
-
-            if (response.data.data.length){
+            const responseData: FreshResponse = await response.json();
+            if (responseData.data.length){
                 setNoticePage(noticePage + 1);
-                setNotifications(prev => [...prev, ...response.data.data]);
+                setNotifications(prev => [...prev, ...responseData.data]);
 
             }
-            if (response.data.data.length < 12){
+            if (responseData.data.length < 12){
                 setNoticePage(-1);
             }
-
         } catch (e) {
             console.log(e);
         }

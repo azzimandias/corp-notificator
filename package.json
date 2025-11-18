@@ -1,15 +1,64 @@
 {
   "name": "corp-notificator-library-antd-react-socket",
-  "private": true,
+  "description": "React notification component with Ant Design and Socket.io support",
   "version": "0.0.1",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "react",
+    "notificarion",
+    "antd",
+    "socket.io",
+    "typescript",
+    "component",
+    "ui"
+  ],
+  "author": "azzimandias <passedtrial@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azzimandias/corp-notificator"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@uiw/react-md-editor": "^4.0.8",
+    "@vitejs/plugin-react": "^5.1.0",
+    "antd": "^5.29.0",
+    "axios": "^1.13.2",
+    "dayjs": "^1.11.19",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "socket.io-client": "^4.8.1",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.3",
+    "vite": "^7.2.2"
+  },
+  "peerDependencies": {
+    "@uiw/react-md-editor": "^4.0.8",
     "antd": "^5.29.0",
     "axios": "^1.13.2",
     "dayjs": "^1.11.19",
@@ -17,18 +66,8 @@
     "react-dom": "^19.2.0",
     "socket.io-client": "^4.8.1"
   },
-  "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.0",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.2",
-    "@vitejs/plugin-react": "^5.1.0",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.3",
-    "vite": "^7.2.2"
+  "dependencies": {
+    "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-lib-inject-css": "^2.2.2"
   }
 }

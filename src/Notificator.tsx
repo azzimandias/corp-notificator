@@ -1,14 +1,13 @@
 import './App.css'
-import NotiBtn from "./NOTIFICATOR/NotiBtn.tsx";
-import {NotificationSocketProvider} from "./NOTIFICATOR/provider/NotificationProvider.tsx";
+import NotiBtn from "./NOTIFICATOR/NotiBtn";
+import {NotificationSocketProvider} from "./NOTIFICATOR/provider/NotificationProvider";
 import type {NotificatorParams} from "./NOTIFICATOR/types/types.ts";
-import {useNotificationSocket} from "./NOTIFICATOR/context/NotificatorSocketContext.tsx";
+import {useNotificationSocket} from "./NOTIFICATOR/context/NotificatorSocketContext";
 import {useEffect} from "react";
 
 const NotificatorInner = ({
                        userdata,
                        httpParams,
-                       fetchParams,
                        socketSubscribe,
                        socketActions
                    }: NotificatorParams) => {
@@ -28,15 +27,8 @@ const NotificatorInner = ({
     } = useNotificationSocket();
 
     useEffect(() => {
-        /*console.log('CORP-CHAT userdata', userdata);
-        console.log('CORP-CHAT httpParams', httpParams);
-        console.log('CORP-CHAT fetchParams', fetchParams);
-        console.log('CORP-CHAT socketSubscribe', socketSubscribe);
-        console.log('CORP-CHAT socketActions', socketActions);*/
-
         let userdataFlag = false;
         let httpParamsFlag = false;
-        let fetchParamsFlag = false;
         let socketSubscribeFlag = false;
         let socketActionsFlag = false;
 
@@ -50,13 +42,6 @@ const NotificatorInner = ({
         if (httpParams && httpParams?.HTTP_HOST && httpParams?.CSRF_TOKEN && httpParams?.PRODMODE && httpParams?.BFF_PORT)
             httpParamsFlag = true;
 
-        if (fetchParams && fetchParams?.fetchChatsListPath) setFetchChatsListPath(fetchParams?.fetchChatsListPath);
-        if (fetchParams && fetchParams?.fetchChatMessagesPath) setFetchChatMessagesPath(fetchParams?.fetchChatMessagesPath);
-        if (fetchParams && fetchParams?.sendSmsPath) setSendSmsPath(fetchParams?.sendSmsPath);
-        if (fetchParams && fetchParams?.markMessagesAsReadPath) setMarkMessagesAsReadPath(fetchParams?.markMessagesAsReadPath);
-        if (fetchParams && fetchParams?.fetchChatsListPath && fetchParams?.fetchChatMessagesPath && fetchParams?.sendSmsPath && fetchParams?.markMessagesAsReadPath)
-            fetchParamsFlag = true;
-
         if (socketSubscribe && socketSubscribe?.subscribeToNotification) setSubscribeToNotificationPath(socketSubscribe?.subscribeToNotification);
         if (socketSubscribe && socketSubscribe?.subscribeToNotification) socketSubscribeFlag = true;
 
@@ -64,12 +49,11 @@ const NotificatorInner = ({
         if (socketActions && socketActions?.readNotification) setReadNotificationPath(socketActions?.readNotification);
         if (socketActions && socketActions?.newNotification && socketActions?.readNotification) socketActionsFlag = true;
 
-        if (userdataFlag && httpParamsFlag && fetchParamsFlag && socketSubscribeFlag && socketActionsFlag)
+        if (userdataFlag && httpParamsFlag && socketSubscribeFlag && socketActionsFlag)
             setInit(true);
     }, [
         userdata,
         httpParams,
-        fetchParams,
         socketSubscribe,
         socketActions,
 

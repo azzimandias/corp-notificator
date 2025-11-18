@@ -1,8 +1,7 @@
 import {useState} from 'react';
 import {NotificationOutlined} from "@ant-design/icons";
 import {Button, Space} from "antd";
-import styles from "../CHAT/components/style/Chat.module.css";
-import NotifierDrawer from "./components/NotifierDrawer.tsx";
+import NotifierDrawer from "./components/NotifierDrawer";
 
 const NotiBtn = () => {
     const [totalUnread, setTotalUnread] = useState(0);
@@ -27,7 +26,7 @@ const NotiBtn = () => {
             >
                 <NotificationOutlined/>
                 {totalUnread > 0 && (
-                    <span className={styles['notification-badge']}>{totalUnread}</span>
+                    <span className={'notification-badge'}>{totalUnread}</span>
                 )}
             </Button>
             <NotifierDrawer is_open={isOpenDrawer}
