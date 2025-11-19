@@ -1,9 +1,9 @@
 import './App.css'
 import NotiBtn from "./NOTIFICATOR/NotiBtn";
 import {NotificationSocketProvider} from "./NOTIFICATOR/provider/NotificationProvider";
-import type {NotificatorParams} from "./NOTIFICATOR/types/types.ts";
+import type {AlertInfo, NotificatorParams} from "./NOTIFICATOR/types/types.ts";
 import {useNotificationSocket} from "./NOTIFICATOR/context/NotificatorSocketContext";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 
 const NotificatorInner = ({
                        userdata,
@@ -11,6 +11,7 @@ const NotificatorInner = ({
                        socketSubscribe,
                        socketActions
                    }: NotificatorParams) => {
+
     const {
         setUserData,
 
@@ -75,12 +76,25 @@ const NotificatorInner = ({
 }
 
 const Notificator = (props: NotificatorParams) => {
+    const { onNewAlert } = props;
 
-  return (
-      <NotificationSocketProvider>
-          <NotificatorInner {...props}/>
-      </NotificationSocketProvider>
-  )
+    const [alertInfo, setAlertInfo] = useState<AlertInfo | null>({
+        message: '',
+        description: '',
+        type: 'info',
+    });
+
+    useEffect(() => {
+        if (onNewAlert) {
+            onNewAlert(alertInfo);
+        }
+    }, [alertInfo, onNewAlert]);
+
+    return (
+        <NotificationSocketProvider setAlertInfo={setAlertInfo}>
+            <NotificatorInner {...props}/>
+        </NotificationSocketProvider>
+    );
 }
 
 export default Notificator

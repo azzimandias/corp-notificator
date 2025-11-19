@@ -5,7 +5,10 @@ import dayjs from "dayjs";
 import axios from "axios";
 import { NotificatorSocketContext } from "../context/NotificatorSocketContext";
 
-export const NotificationSocketProvider = ({ children }: { children: React.ReactNode }) => {
+export const NotificationSocketProvider = ({ children, setAlertInfo }: {
+    children: React.ReactNode,
+    setAlertInfo:  React.Dispatch<React.SetStateAction<AlertInfo | null>>
+}) => {
     const socketRef = useRef<Socket | null>(null);
     const [connected, setConnected] = useState<boolean>(false);
     const [connectionStatus, setConnectionStatus] = useState<string>('disconnected');
@@ -15,7 +18,7 @@ export const NotificationSocketProvider = ({ children }: { children: React.React
 
     const [HTTP_HOST, SET_HTTP_HOST] = useState<string>('');
     const [CSRF_TOKEN, SET_CSRF_TOKEN] = useState<string>('');
-    const [PRODMODE, SET_PRODMODE] = useState<boolean>(false);
+    const [PRODMODE, SET_PRODMODE] = useState<boolean>(true);
     const [BFF_PORT, SET_BFF_PORT] = useState<number>(0);
 
     const [subscribeToNotificationPath, setSubscribeToNotificationPath] = useState<string | null>(null);
@@ -23,12 +26,6 @@ export const NotificationSocketProvider = ({ children }: { children: React.React
     const [readNotificationPath, setReadNotificationPath] = useState<string | null>(null);
 
     const [refreshKey, setRefreshKey] = useState<number>(0);
-    const [isAlertVisibleKey, setIsAlertVisibleKey] = useState<number>(0);
-    const [alertInfo, setAlertInfo] = useState<AlertInfo>({
-        message: '',
-        description: '',
-        type: 'info',
-    });
 
     const [init, setInit] = useState<boolean>(false);
 
@@ -57,7 +54,6 @@ export const NotificationSocketProvider = ({ children }: { children: React.React
         socket.on(newNotificationPath ?? '', (data) => {
             console.log('WS new:notification', data);
             setRefreshKey(dayjs().unix());
-            setIsAlertVisibleKey(dayjs().unix());
             setAlertInfo({
                 message: 'Новое уведомление.',
                 description: data.message,
@@ -75,7 +71,17 @@ export const NotificationSocketProvider = ({ children }: { children: React.React
         socket.on('connect_error', () => {
             console.log('CHAT WEBSOCKET CONNECT ERROR');
         });
-    }, [init, PRODMODE, BFF_PORT, HTTP_HOST, CSRF_TOKEN, subscribeToNotificationPath, newNotificationPath, readNotificationPath]);
+    }, [
+        init,
+        PRODMODE,
+        BFF_PORT,
+        HTTP_HOST,
+        CSRF_TOKEN,
+        subscribeToNotificationPath,
+        newNotificationPath,
+        readNotificationPath,
+        setAlertInfo,
+    ]);
 
 
     useEffect(() => {
@@ -122,9 +128,6 @@ export const NotificationSocketProvider = ({ children }: { children: React.React
 
                 connected,
                 connectionStatus,
-
-                isAlertVisibleKey,
-                alertInfo,
 
                 userdata,
 

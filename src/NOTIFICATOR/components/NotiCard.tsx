@@ -23,26 +23,28 @@ const NotiCard = ({data, on_read}: {
     const [readAnimation, setReadAnimation] = useState<boolean>(false);
 
     const mouseOver = () => {
-        makeUpdate();
+        if (!isReq && !isRead){
+            makeUpdate();
+        }
     }
 
     const makeRead = () => {
-        makeUpdate();
+        if (!isRead){
+            makeUpdate();
+        }
     }
 
     const makeUpdate = () => {
-        if (!isRead){
-            setReadAnimation(true);
-            setIsRead(true);
-            setTimeout(() => {
-                setReadAnimation(false);
-            }, 600);
-            setUpdated(dayjs());
-            if (on_read){
-                on_read(data.id);
-            }
-            setColor('#b3b3b3');
+        setReadAnimation(true);
+        setIsRead(true);
+        setTimeout(() => {
+            setReadAnimation(false);
+        }, 600);
+        setUpdated(dayjs());
+        if (on_read){
+            on_read(data.id);
         }
+        setColor('#b3b3b3');
     }
 
     useEffect(()=>{

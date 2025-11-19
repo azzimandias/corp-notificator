@@ -4,8 +4,6 @@ import type {AlertInfo, UserData} from "../types/types.ts";
 interface NotificationSocketContextType {
     connected: boolean;
     connectionStatus: string;
-    isAlertVisibleKey: number;
-    alertInfo: AlertInfo;
 
     userdata: UserData | null;
     setUserData: (data: UserData) => void;

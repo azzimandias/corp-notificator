@@ -3,6 +3,7 @@ export interface NotificatorParams {
     httpParams: HttpParams;
     socketSubscribe: SocketSubscribe;
     socketActions: SocketActions;
+    onNewAlert?: ((alertInfo: AlertInfo | null) => void) | null;
 }
 
 export interface HttpParams {

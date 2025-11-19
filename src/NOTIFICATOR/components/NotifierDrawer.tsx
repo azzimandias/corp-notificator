@@ -4,6 +4,7 @@ import NotiCard from './NotiCard';
 import { MOCK_NOTICES } from '../mock/mock';
 import {useNotificationSocket} from "../context/NotificatorSocketContext";
 import type {Notification} from "../types/types";
+import dayjs from "dayjs";
 
 interface FreshResponse {
     count?: number;
@@ -36,6 +37,7 @@ const NotifierDrawer = ({is_open, on_count_change, on_close}: {
     const {
         PRODMODE,
         CSRF_TOKEN,
+        init,
         refreshKey,  // провоцирует refetch
     } = useNotificationSocket();
 
@@ -76,13 +78,13 @@ const NotifierDrawer = ({is_open, on_count_change, on_close}: {
             const response = await fetch('/api/notice/fresh' + '?_token=' + CSRF_TOKEN);
             const responseData: FreshResponse = await response.json();
 
-            setNotifications(responseData.data);
-            const ignore: number[] = [];
-            for (let i = 0; i < responseData.data.length; i++){
-                ignore.push(responseData.data[i].id);
-            }
-            setNoticeIgnore(ignore);
-            setCountOfNewNotifications(ignore.length);
+            setNotifications(prev => {
+                const newNoties = filterNoties(responseData.data, prev);
+                return ([
+                    ...newNoties,
+                    ...prev,
+                ]);
+            });
         } catch (e) {
             console.log(e);
         }
@@ -119,6 +121,9 @@ const NotifierDrawer = ({is_open, on_count_change, on_close}: {
     }, [CSRF_TOKEN, PRODMODE, noticeIgnore, noticePage]);
 
 
+    const filterNoties = (noties: Notification[], prev: Notification[]): Notification[] => {
+        return noties.filter(res => !prev.find(n => +n.id === +res.id));
+    };
 
 
     const handleClose = () => {
@@ -129,9 +134,6 @@ const NotifierDrawer = ({is_open, on_count_change, on_close}: {
     }
 
     useEffect(() => {
-        getFreshNotices().then();
-    }, [refreshKey, getFreshNotices]);
-    useEffect(() => {
         if (on_count_change){
             on_count_change(countOfNewNotifications);
         }
@@ -141,19 +143,19 @@ const NotifierDrawer = ({is_open, on_count_change, on_close}: {
         setNotificatorOpened(is_open);
     }, [is_open]);
     useEffect(() => {
-        if (notificatorOpened){
+        if (init){
             getFreshNotices().then();
-        }
-    }, [notificatorOpened, getFreshNotices]);
-    useEffect(() => {
-        if (PRODMODE){
-            getFreshNotices().then();
-        } else {
+        } else if (!PRODMODE) {
             setNotifications(MOCK_NOTICES);
-            /*console.log("MANOK" , MOCK_NOTICES);*/
         }
-    }, [PRODMODE, getFreshNotices, setNotifications]);
+    }, [init, refreshKey, PRODMODE, getFreshNotices, setNotifications]);
     useEffect(() => {
+        const ignore: number[] = [];
+        for (let i = 0; i < notifications.length; i++){
+            ignore.push(notifications[i].id);
+        }
+        setNoticeIgnore(ignore);
+        setCountOfNewNotifications((notifications.filter(noti => !noti.is_read)).length);
         setNotificatorLoading(false);
     }, [notifications]);
 
@@ -168,13 +170,16 @@ const NotifierDrawer = ({is_open, on_count_change, on_close}: {
             onClose={handleClose}
         >
             <div>
-                {notifications.map((item)=>(
-                    <NotiCard
-                        data={item}
-                        key={`notic_${item.id}`}
-                        on_read={notificationRead}
-                    />
-                ))}
+                {notifications.slice()
+                              .sort((a, b) => dayjs(b.created_at).valueOf() - dayjs(a.created_at).valueOf())
+                              .map((item) => (
+                                    <NotiCard
+                                        data={item}
+                                        key={`notic_${item.id}`}
+                                        on_read={notificationRead}
+                                    />
+                              ))
+                }
             </div>
 
             { noticePage > 0 && (
